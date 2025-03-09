@@ -91,7 +91,6 @@ export const getUserProfile = createAsyncThunk<User, void, { rejectValue: string
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token || localStorage.getItem('token');
-      console.log("Token from state:", token);
       const response = await fetch(`${API_URL}/auth/me`, {
         method: "GET",
         credentials: "include",
@@ -105,7 +104,9 @@ export const getUserProfile = createAsyncThunk<User, void, { rejectValue: string
         throw new Error("Failed to fetch user profile");
       }
 
-      return await response.json();
+      // return await response.json();
+      const data = await response.json();
+      return data.user;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

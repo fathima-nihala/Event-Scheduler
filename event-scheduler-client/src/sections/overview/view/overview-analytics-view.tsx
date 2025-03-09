@@ -46,7 +46,7 @@ export function OverviewAnalyticsView() {
 
         <Grid xs={12} sm={6} md={3}  padding={1}>
           <AnalyticsWidgetSummary
-            title="Purchase orders"
+            title="Tasks"
             percent={2.8}
             total={1723315}
             color="warning"

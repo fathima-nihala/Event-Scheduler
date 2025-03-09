@@ -1,3 +1,4 @@
+import { useDispatch, useSelector } from 'react-redux';
 import {
   _id,
   _price,
@@ -9,14 +10,34 @@ import {
   _postTitles,
   _description,
 } from './_mock';
+import { AppDispatch, RootState } from '../redux/store';
+import { useEffect } from 'react';
+import { getUserProfile } from '../slices/authSlice';
 
 // ----------------------------------------------------------------------
 
-export const _myAccount = {
-  displayName: 'Jaydon Frankie',
-  email: 'demo@minimals.cc',
-  photoURL: '/assets/images/avatar/avatar-25.webp',
+// export const _myAccount = {
+//   displayName: 'Jaydon Frankie',
+//   email: 'demo@minimals.cc',
+//   photoURL: '/assets/images/avatar/avatar-25.webp',
+// };
+
+export const _myAccount = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.auth.user);
+  console.log(user);
+  
+  
+  useEffect(() => {
+    dispatch(getUserProfile());
+  }, [dispatch])
+  return {
+    displayName: user?.name || 'Guest User',
+    email: user?.email || 'guest@example.com',
+    photoURL: '/assets/images/avatar/default-avatar.webp',
+  };
 };
+
 
 // ----------------------------------------------------------------------
 
