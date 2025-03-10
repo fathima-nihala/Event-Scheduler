@@ -20,7 +20,6 @@ interface Event {
     __v: number;
 }
 
-
 // Define State Interface
 interface EventState {
     events: Event[];
