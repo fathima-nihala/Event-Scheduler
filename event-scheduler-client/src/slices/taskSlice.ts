@@ -39,13 +39,20 @@ const API_URL = import.meta.env?.VITE_API_URL;
 // Thunks
 export const fetchGlobalTasks = createAsyncThunk<
   Task[],
-  void,
+  // void,
+  string | undefined,
   { rejectValue: string; state: RootState }
->("tasks/fetchGlobalTasks", async (_, { rejectWithValue, getState }) => {
+>("tasks/fetchGlobalTasks", async (search=undefined, { rejectWithValue, getState }) => {
   try {
     const token = getState().auth.token || localStorage.getItem("token");
     
-    const response = await fetch(`${API_URL}/task/global`, {
+    let url = `${API_URL}/task/global`;
+    if (search) {
+      url += `?search=${encodeURIComponent(search)}`;
+    }
+    
+    // const response = await fetch(`${API_URL}/task/global`, {
+      const response = await fetch(url, {
       method: "GET",
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
@@ -67,13 +74,18 @@ export const fetchGlobalTasks = createAsyncThunk<
 
 export const fetchPrivateTasks = createAsyncThunk<
   Task[],
-  void,
+  // void,
+  string | undefined,
   { rejectValue: string; state: RootState }
->("tasks/fetchPrivateTasks", async (_, { rejectWithValue, getState }) => {
+>("tasks/fetchPrivateTasks", async (search = undefined, { rejectWithValue, getState }) => {
   try {
     const token = getState().auth.token || localStorage.getItem("token");
-    
-    const response = await fetch(`${API_URL}/task/private`, {
+    let url = `${API_URL}/task/private`;
+    if (search) {
+      url += `?search=${encodeURIComponent(search)}`;
+    }
+    // const response = await fetch(`${API_URL}/task/private`, {
+      const response = await fetch(url, {
       method: "GET",
       headers: {
         Authorization: token ? `Bearer ${token}` : "",

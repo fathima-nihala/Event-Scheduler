@@ -114,7 +114,12 @@ exports.createPrivateTask = catchAsyncError(async (req, res, next) => {
 // Get User's Private Tasks
 exports.getUserPrivateTasks = catchAsyncError(async (req, res, next) => {
     try {
-        const tasks = await Task.find({ userId: req.user.id }).populate("dependencies", "description");
+        const { search } = req.query;
+        let query = { userId: req.user.id, isGlobal: false };
+        if (search) {
+            query.description = { $regex: search, $options: "i" };
+        }
+        const tasks = await Task.find(query).populate("dependencies", "description");
 
         res.status(200).json({
             statusCode: 200,
