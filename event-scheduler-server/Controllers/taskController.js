@@ -24,7 +24,15 @@ exports.createGlobalTask = catchAsyncError(async (req, res, next) => {
 // Get All Global Tasks
 exports.getAllGlobalTasks = catchAsyncError(async (req, res, next) => {
     try {
-        const tasks = await Task.find({ isGlobal: true }).populate("dependencies", "description");
+        const { search } = req.query;
+        let query = { isGlobal: true };
+        if (search) {
+            query.description = { $regex: search, $options: "i" };
+        }
+
+
+
+        const tasks = await Task.find(query).populate("dependencies", "description");
 
         res.status(200).json({
             statusCode: 200,

@@ -19,7 +19,7 @@ export const navData = [
   },
   {
     title: 'Tasks',
-    path: '/blog',
+    path: '/tasks',
     icon: icon('ic-blog'),
   },
   {

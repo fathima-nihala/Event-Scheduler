@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 
-import { CONFIG } from '../../src/config-global';
+import { CONFIG } from '../config-global';
 
-import { BlogView } from '../../src/sections/blog/view';
+import { TaskView } from '../sections/blog/view';
 
 // ----------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ export default function Page() {
         <title> {`Blog - ${CONFIG.appName}`}</title>
       </Helmet>
 
-      <BlogView />
+      <TaskView />
     </>
   );
 }
