@@ -24,7 +24,7 @@ export const navData = [
   },
   {
     title: 'Events',
-    path: '/sign-in',
+    path: '/events',
     icon: icon('ic-lock'),
   },
  

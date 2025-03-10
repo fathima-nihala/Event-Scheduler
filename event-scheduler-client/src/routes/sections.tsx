@@ -19,6 +19,7 @@ export const UserPage = lazy(() => import('../../src/pages/user'));
 export const SignInPage = lazy(() => import('../../src/pages/sign-in'));
 export const Page404 = lazy(() => import('../../src/pages/page-not-found'));
 export const Login = lazy(() => import('../../src/components/Login'));
+export const Event = lazy(() => import('../sections/event/event'))
 
 // ----------------------------------------------------------------------
 
@@ -85,6 +86,8 @@ export function Router() {
         { element: <HomePage />, index: true },
         { path: 'user', element: <UserPage /> },
         { path: 'tasks', element: <BlogPage /> },
+        { path: 'events', element: <Event /> },
+
       ],
     },
     {
