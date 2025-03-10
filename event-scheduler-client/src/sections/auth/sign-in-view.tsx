@@ -9,9 +9,9 @@ import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { useRouter } from '../../../src/routes/hooks';
+import { useRouter } from '../../routes/hooks';
 
-import { Iconify } from '../../../src/components/iconify';
+import { Iconify } from '../../components/iconify';
 
 // ----------------------------------------------------------------------
 

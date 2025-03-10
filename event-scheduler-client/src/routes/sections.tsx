@@ -6,19 +6,19 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { alpha } from '@mui/material/styles';
 
 
-import { DashboardLayout } from '../../src/layouts/dashboard';
+import { DashboardLayout } from '../layouts/dashboard';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserProfile } from '../slices/authSlice';
-import { AppDispatch, RootState } from '../../src/redux/store';
+import { AppDispatch, RootState } from '../redux/store';
 import SignUp from '../components/SignUp';
 // ----------------------------------------------------------------------
 
-export const HomePage = lazy(() => import('../../src/pages/home'));
+export const HomePage = lazy(() => import('../pages/home'));
 export const BlogPage = lazy(() => import('../pages/tasks'));
-export const UserPage = lazy(() => import('../../src/pages/user'));
-export const SignInPage = lazy(() => import('../../src/pages/sign-in'));
-export const Page404 = lazy(() => import('../../src/pages/page-not-found'));
-export const Login = lazy(() => import('../../src/components/Login'));
+export const UserPage = lazy(() => import('../pages/user'));
+export const SignInPage = lazy(() => import('../pages/sign-in'));
+export const Page404 = lazy(() => import('../pages/page-not-found'));
+export const Login = lazy(() => import('../components/Login'));
 export const Event = lazy(() => import('../sections/event/event'))
 
 // ----------------------------------------------------------------------

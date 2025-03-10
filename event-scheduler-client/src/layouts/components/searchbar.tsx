@@ -11,9 +11,9 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 
-import { bgBlur } from '../../src/theme/styles';
+import { bgBlur } from '../../theme/styles';
 
-import { Iconify } from 'src/components/iconify';
+import { Iconify } from '../../components/iconify';
 
 // ----------------------------------------------------------------------
 
