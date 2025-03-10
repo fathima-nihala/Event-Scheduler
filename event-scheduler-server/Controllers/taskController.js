@@ -30,8 +30,6 @@ exports.getAllGlobalTasks = catchAsyncError(async (req, res, next) => {
             query.description = { $regex: search, $options: "i" };
         }
 
-
-
         const tasks = await Task.find(query).populate("dependencies", "description");
 
         res.status(200).json({

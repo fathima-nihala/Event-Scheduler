@@ -6,7 +6,8 @@ const TaskSchema = new mongoose.Schema({
   dependencies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }], 
   timing: {
     relation: { type: String, enum: ["before", "after", "start", "end"], required: true },
-    offset: { type: Number, required: true } 
+    offset: { type: Number, required: true },
+    unit: { type: String, enum: ["minutes", "hours", "seconds"], default: "minutes" }
   },
   isGlobal: { type: Boolean, default: false }, 
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: function() { return !this.isGlobal; } }
