@@ -10,8 +10,8 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
-import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
+import { Label } from '../../../src/components/label';
+import { Iconify } from '../../../src/components/iconify';
 
 // ----------------------------------------------------------------------
 

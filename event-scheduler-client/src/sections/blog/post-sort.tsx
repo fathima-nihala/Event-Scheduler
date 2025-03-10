@@ -7,9 +7,10 @@ import Popover from '@mui/material/Popover';
 import MenuList from '@mui/material/MenuList';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
-import { varAlpha } from '../../src/theme/styles';
+// import { varAlpha } from '../../../src/theme/styles';
 
-import { Iconify } from 'src/components/iconify';
+import { Iconify } from '../../../src/components/iconify';
+import { alpha } from '@mui/system';
 
 // ----------------------------------------------------------------------
 
@@ -45,7 +46,8 @@ export function PostSort({ options, sortBy, onSort, sx, ...other }: PostSortProp
           />
         }
         sx={{
-          bgcolor: (theme) => varAlpha(theme.vars.palette.grey['500Channel'], 0.08),
+          bgcolor: (theme) => alpha(theme.palette.grey['500'], 0.08),
+
           ...sx,
         }}
         {...other}

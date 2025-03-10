@@ -6,13 +6,13 @@ import Card from '@mui/material/Card';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 
-import { fDate } from 'src/utils/format-time';
-import { fShortenNumber } from 'src/utils/format-number';
+import { fDate } from '../../../src/utils/format-time';
+import { fShortenNumber } from '../../../src/utils/format-number';
 
-import { varAlpha } from '../../src/theme/styles';
+import { varAlpha } from '../../../src/theme/styles';
 
-import { Iconify } from 'src/components/iconify';
-import { SvgColor } from 'src/components/svg-color';
+import { Iconify } from '../../../src/components/iconify';
+import { SvgColor } from '../../../src/components/svg-color';
 
 // ----------------------------------------------------------------------
 

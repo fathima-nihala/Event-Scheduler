@@ -1,5 +1,5 @@
 import Typography from '@mui/material/Typography';
-import { _tasks, _posts, _timeline } from '../../../_mock';
+// import { _tasks, _posts, _timeline } from '../../../_mock';
 import { DashboardContent } from '../../../layouts/dashboard';
 import { AnalyticsCurrentVisits } from '../analytics-current-visits';
 import { AnalyticsWebsiteVisits } from '../analytics-website-visits';

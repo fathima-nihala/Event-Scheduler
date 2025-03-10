@@ -1,5 +1,6 @@
-import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 
+import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles'; 
 import { useEffect } from 'react';
 
 import Box from '@mui/material/Box';
@@ -56,14 +57,17 @@ export function NavDesktop({
         bgcolor: 'var(--layout-nav-bg)',
         zIndex: 'var(--layout-nav-zIndex)',
         width: 'var(--layout-nav-vertical-width)',
-        borderRight: `1px solid var(--layout-nav-border-color, ${varAlpha(theme.vars.palette.grey['500Channel'], 0.12)})`,
+        // borderRight: `1px solid var(--layout-nav-border-color, ${varAlpha(theme.vars.palette.grey['500Channel'], 0.12)})`,
+        borderRight: theme.vars?.palette
+          ? `1px solid var(--layout-nav-border-color, ${varAlpha(theme.vars.palette.grey['500Channel'], 0.12)})`
+          : `1px solid ${alpha(theme.palette.grey[500], 0.12)}`,
         [theme.breakpoints.up(layoutQuery)]: {
           display: 'flex',
         },
         ...sx,
       }}
     >
-      <NavContent data={data} slots={slots} 
+      <NavContent data={data} slots={slots}
       />
     </Box>
   );
@@ -102,8 +106,8 @@ export function NavMobile({
         },
       }}
     >
-      <NavContent data={data} slots={slots} 
-       />
+      <NavContent data={data} slots={slots}
+      />
     </Drawer>
 
   );
@@ -120,7 +124,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
 
       {slots?.topArea}
 
-      <Scrollbar fillContent sx={{mt: 6}}>
+      <Scrollbar fillContent sx={{ mt: 6 }}>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
           <Box component="ul" gap={0.5} display="flex" flexDirection="column">
             {data.map((item) => {

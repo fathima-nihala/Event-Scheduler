@@ -9,7 +9,6 @@ import { Main } from './main';
 import { layoutClasses } from '../classes';
 import { NavMobile, NavDesktop } from './nav';
 import { navData } from '../config-nav-dashboard';
-import { _workspaces } from '../config-nav-workspace';
 import { MenuButton } from '../components/menu-button';
 import { LayoutSection } from '../core/layout-section';
 import { HeaderSection } from '../core/header-section';

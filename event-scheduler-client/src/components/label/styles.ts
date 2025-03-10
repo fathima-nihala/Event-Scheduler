@@ -3,7 +3,7 @@ import type { Theme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 
-import { varAlpha, stylesMode } from '../../src/theme/styles';
+import { varAlpha, stylesMode } from '../../theme/styles';
 
 import type { LabelColor, LabelVariant } from './types';
 

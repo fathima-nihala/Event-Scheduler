@@ -13,6 +13,7 @@ import { Main } from './main';
 import { HeaderSection } from '../core/header-section';
 import { LayoutSection } from '../core/layout-section';
 
+
 // ----------------------------------------------------------------------
 
 export type AuthLayoutProps = {

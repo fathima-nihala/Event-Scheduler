@@ -5,7 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { Iconify } from 'src/components/iconify';
+import { Iconify } from '../../../src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -22,7 +22,8 @@ export function UserTableToolbar({ numSelected, filterName, onFilterName }: User
         height: 96,
         display: 'flex',
         justifyContent: 'space-between',
-        p: (theme) => theme.spacing(0, 1, 0, 3),
+        // p: (theme) => theme.spacing(0, 1, 0, 3),
+       padding: (theme) => `0px ${theme.spacing(1)} 0px ${theme.spacing(3)}`,
         ...(numSelected > 0 && {
           color: 'primary.main',
           bgcolor: 'primary.lighter',

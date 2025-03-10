@@ -3,13 +3,14 @@ import { Outlet, Navigate, useRoutes, useLocation } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import { alpha } from '@mui/material/styles';
 
-import { varAlpha } from '../../src/theme/styles';
-// import { AuthLayout } from '../../src/layouts/auth';
+
 import { DashboardLayout } from '../../src/layouts/dashboard';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserProfile } from '../slices/authSlice';
-import { AppDispatch, RootState  } from '../../src/redux/store';
+import { AppDispatch, RootState } from '../../src/redux/store';
+import SignUp from '../components/SignUp';
 // ----------------------------------------------------------------------
 
 export const HomePage = lazy(() => import('../../src/pages/home'));
@@ -17,7 +18,7 @@ export const BlogPage = lazy(() => import('../../src/pages/blog'));
 export const UserPage = lazy(() => import('../../src/pages/user'));
 export const SignInPage = lazy(() => import('../../src/pages/sign-in'));
 export const Page404 = lazy(() => import('../../src/pages/page-not-found'));
-export const Login = lazy(()=> import('../../src/components/Login'));
+export const Login = lazy(() => import('../../src/components/Login'));
 
 // ----------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ const renderFallback = (
       sx={{
         width: 1,
         maxWidth: 320,
-        bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
+        bgcolor: (theme) => alpha(theme.palette.text.primary, 0.16),
         [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
       }}
     />
@@ -39,23 +40,22 @@ const ProtectedRoute = () => {
   const { user, loading } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
-  
+
   // Check for token immediately
   const token = localStorage.getItem('token');
   const isAuthenticated = !!token;
-  
+
   useEffect(() => {
-    // Only fetch user data if we have a token but no user
     if (isAuthenticated && !user && !loading) {
-      dispatch(getUserProfile() as any);
+      dispatch(getUserProfile());
     }
   }, [isAuthenticated, user, loading, dispatch]);
 
   // Show loading state while checking authentication
-  if (loading) {
-    return renderFallback;
-  }
-  
+  // if (loading) {
+  //   return renderFallback;
+  // }
+
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     console.log("No token found, redirecting to sign-in"); // Debug log
@@ -96,6 +96,14 @@ export function Router() {
       ),
     },
     {
+      path: 'sign-up',
+      element: (
+        <Suspense fallback={renderFallback}>
+          <SignUp />
+        </Suspense>
+      ),
+    },
+    {
       path: '404',
       element: <Suspense fallback={renderFallback}><Page404 /></Suspense>,
     },
@@ -106,39 +114,3 @@ export function Router() {
   ]);
 }
 
-
-
-// export function Router() {
-//   return useRoutes([
-//     {
-//       element: (
-//         <DashboardLayout>
-//           <Suspense fallback={renderFallback}>
-//             <Outlet />
-//           </Suspense>
-//         </DashboardLayout>
-//       ),
-//       children: [
-//         { element: <HomePage />, index: true },
-//         { path: 'user', element: <UserPage /> },
-//         { path: 'blog', element: <BlogPage /> },
-//       ],
-//     },
-//     {
-//       path: 'sign-in',
-//       element: (
-//         <AuthLayout>
-//           <SignInPage />
-//         </AuthLayout>
-//       ),
-//     },
-//     {
-//       path: '404',
-//       element: <Page404 />,
-//     },
-//     {
-//       path: '*',
-//       element: <Navigate to="/404" replace />,
-//     },
-//   ]);
-// }

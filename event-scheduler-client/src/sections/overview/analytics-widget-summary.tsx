@@ -4,11 +4,11 @@ import type { ChartOptions } from '../..//components/chart';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import { useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 
 import { fNumber, fPercent, fShortenNumber } from '../../utils/format-number';
 
-import { varAlpha, bgGradient } from '../../theme/styles';
+import { bgGradient } from '../../theme/styles';
 
 import { Iconify } from '../../components/iconify';
 import { SvgColor } from '../../components/svg-color';
@@ -83,8 +83,11 @@ export function AnalyticsWidgetSummary({
   return (
     <Card
       sx={{
+        // ...bgGradient({
+        //   color: `135deg, ${varAlpha(theme.vars.palette[color].lighterChannel, 0.48)}, ${varAlpha(theme.vars.palette[color].lightChannel, 0.48)}`,
+        // }),
         ...bgGradient({
-          color: `135deg, ${varAlpha(theme.vars.palette[color].lighterChannel, 0.48)}, ${varAlpha(theme.vars.palette[color].lightChannel, 0.48)}`,
+          color: `135deg, ${alpha(theme.palette[color].lighter, 0.48)}, ${alpha(theme.palette[color].light, 0.48)}`,
         }),
         p: 3,
         boxShadow: 'none',

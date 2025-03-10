@@ -2,18 +2,20 @@ import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Unstable_Grid2';
+// import Grid from '@mui/material/Unstable_Grid2';
+
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
 
-import { _posts } from 'src/_mock';
-import { DashboardContent } from 'src/layouts/dashboard';
+import { _posts } from '../../../../src/_mock';
+import { DashboardContent } from '../../../../src/layouts/dashboard';
 
-import { Iconify } from 'src/components/iconify';
+import { Iconify } from '../../../../src/components/iconify';
 
 import { PostItem } from '../post-item';
 import { PostSort } from '../post-sort';
 import { PostSearch } from '../post-search';
+import Grid from '@mui/material/Grid';
 
 // ----------------------------------------------------------------------
 

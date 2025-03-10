@@ -1,4 +1,4 @@
-import type { Theme, Components } from '@mui/material/styles';
+import { type Theme, type Components, alpha } from '@mui/material/styles';
 
 import SvgIcon from '@mui/material/SvgIcon';
 
@@ -9,7 +9,9 @@ import { varAlpha } from '../styles';
 const MuiBackdrop: Components<Theme>['MuiBackdrop'] = {
   styleOverrides: {
     root: ({ theme }) => ({
-      backgroundColor: varAlpha(theme.vars.palette.grey['900Channel'], 0.8),
+      // backgroundColor: varAlpha(theme.palette.grey['900Channel'], 0.8),
+      backgroundColor: alpha(theme.palette.grey['900'], 0.8),
+
     }),
     invisible: {
       background: 'transparent',
@@ -23,11 +25,11 @@ const MuiButton: Components<Theme>['MuiButton'] = {
   },
   styleOverrides: {
     containedInherit: ({ theme }) => ({
-      color: theme.vars.palette.common.white,
-      backgroundColor: theme.vars.palette.grey[800],
+      color: theme.palette.common.white,
+      backgroundColor: theme.palette.grey[800],
       '&:hover': {
-        color: theme.vars.palette.common.white,
-        backgroundColor: theme.vars.palette.grey[800],
+        color: theme.palette.common.white,
+        backgroundColor: theme.palette.grey[800],
       },
     }),
     sizeLarge: {
@@ -62,7 +64,7 @@ const MuiCardHeader: Components<Theme>['MuiCardHeader'] = {
 const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
   styleOverrides: {
     notchedOutline: ({ theme }) => ({
-      borderColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.2),
+      borderColor: varAlpha(theme.palette.grey['500Channel'], 0.2),
     }),
   },
 };
@@ -74,7 +76,8 @@ const MuiPaper: Components<Theme>['MuiPaper'] = {
   styleOverrides: {
     root: { backgroundImage: 'none' },
     outlined: ({ theme }) => ({
-      borderColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.16),
+      // borderColor: varAlpha(theme.palette.grey['500Channel'], 0.16),
+      borderColor: alpha(theme.palette.grey[500], 0.16),
     }),
   },
 };
@@ -83,9 +86,9 @@ const MuiTableCell: Components<Theme>['MuiTableCell'] = {
   styleOverrides: {
     head: ({ theme }) => ({
       fontSize: theme.typography.pxToRem(14),
-      color: theme.vars.palette.text.secondary,
+      color: theme.palette.text.secondary,
       fontWeight: theme.typography.fontWeightSemiBold,
-      backgroundColor: theme.vars.palette.background.neutral,
+      backgroundColor: theme.palette.background.neutral,
     }),
   },
 };
