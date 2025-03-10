@@ -14,17 +14,24 @@ import {
   updateTask, 
   deleteTask 
 } from "../../../slices/taskSlice";
+import { useSnackbar } from "notistack";
+
 
 interface TimingInfo {
   relation: "before" | "after" | "start" | "end";
   offset: number;
+  unit: "minutes" | "hours" | "seconds";
 }
 
-interface Task {
+// Using type imports to handle existing Task type from Redux store
+type Task = any; 
+
+// Our local interface definition
+interface TaskItem {
   _id: string;
   description: string;
-  duration: number;
-  dependencies: Task[] | string[];
+  duration: number; // Duration in hours
+  dependencies: TaskItem[] | string[];
   timing: TimingInfo;
   isGlobal: boolean;
   userId?: string;
@@ -38,6 +45,7 @@ interface FormValues {
   duration: number;
   'timing.relation': 'before' | 'after' | 'start' | 'end';
   'timing.offset': number;
+  'timing.unit': 'minutes' | 'hours' | 'seconds';
   isGlobal: boolean;
 }
 
@@ -45,9 +53,10 @@ interface FormValues {
 interface FormErrors {
   description?: string;
   duration?: string;
+  'timing.offset'?: string;
 }
 
-// Define interface for task creation/update data - matches the expected types in the slice
+// Define interface for task creation/update data
 interface TaskData {
   description: string;
   duration: number;
@@ -61,30 +70,50 @@ export function TaskView() {
   const { globalTasks, privateTasks, loading, error } = useSelector((state: RootState) => state.tasks);
   const { user } = useSelector((state: RootState) => state.auth);
   const [openDialog, setOpenDialog] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
   const [formValues, setFormValues] = useState<FormValues>({
     description: "",
     duration: 0,
     "timing.relation": "after",
     "timing.offset": 0,
+    "timing.unit": "minutes",
     isGlobal: false
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const { enqueueSnackbar } = useSnackbar();
+
 
   useEffect(() => {
     dispatch(fetchGlobalTasks());
     dispatch(fetchPrivateTasks());
   }, [dispatch]);
 
+  // Convert Task from Redux to our TaskItem interface
+  const convertToTaskItem = (task: Task): TaskItem => {
+    return {
+      _id: task._id,
+      description: task.description,
+      duration: task.duration,
+      dependencies: task.dependencies,
+      timing: task.timing,
+      isGlobal: task.isGlobal,
+      userId: task.userId,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt
+    };
+  };
+
   const handleOpenDialog = (task: Task | null = null) => {
     if (task) {
-      setEditingTask(task);
+      const taskItem = convertToTaskItem(task);
+      setEditingTask(taskItem);
       setFormValues({
-        description: task.description,
-        duration: task.duration,
-        "timing.relation": task.timing.relation,
-        "timing.offset": task.timing.offset,
-        isGlobal: task.isGlobal
+        description: taskItem.description,
+        duration: taskItem.duration,
+        "timing.relation": taskItem.timing.relation,
+        "timing.offset": taskItem.timing.offset,
+        "timing.unit": taskItem.timing.unit || "minutes", // Use the unit from the task or default to minutes
+        isGlobal: taskItem.isGlobal
       });
     } else {
       setEditingTask(null);
@@ -93,6 +122,7 @@ export function TaskView() {
         duration: 0,
         "timing.relation": "after",
         "timing.offset": 0,
+        "timing.unit": "minutes",
         isGlobal: false
       });
     }
@@ -112,6 +142,9 @@ export function TaskView() {
     if (formValues.duration <= 0) {
       errors.duration = "Duration must be greater than 0";
     }
+    if (formValues["timing.offset"] < 0) {
+      errors["timing.offset"] = "Offset cannot be negative";
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -121,10 +154,11 @@ export function TaskView() {
 
     const taskData: TaskData = {
       description: formValues.description,
-      duration: formValues.duration,
+      duration: formValues.duration, // Duration in hours
       timing: {
         relation: formValues["timing.relation"],
-        offset: formValues["timing.offset"]
+        offset: formValues["timing.offset"],
+        unit: formValues["timing.unit"]
       },
       isGlobal: formValues.isGlobal,
       dependencies: []
@@ -135,12 +169,16 @@ export function TaskView() {
         id: editingTask._id,
         taskData,
         isGlobal: editingTask.isGlobal
-      }));
+      }))
+      .then(() => enqueueSnackbar("Task updated successfully", { variant: "success" }))
+      .catch(() => enqueueSnackbar("Failed to update task", { variant: "error" }));
     } else {
       dispatch(createTask({
         taskData,
         isGlobal: formValues.isGlobal
-      }));
+      }))
+      .then(() => enqueueSnackbar("Task created successfully", { variant: "success" }))
+      .catch(() => enqueueSnackbar("Failed to create task", { variant: "error" }));
     }
 
     handleCloseDialog();
@@ -153,7 +191,9 @@ export function TaskView() {
     if (name) {
       setFormValues(prev => ({
         ...prev,
-        [name]: name === "isGlobal" ? value === "true" : value
+        [name]: name === "isGlobal" ? value === "true" : 
+                name === "duration" ? Number(value) : 
+                name === "timing.offset" ? Number(value) : value
       }));
     }
   };
@@ -163,11 +203,74 @@ export function TaskView() {
       dispatch(deleteTask({
         id: task._id,
         isGlobal: task.isGlobal
-      }));
+      }))
+      .then(() => enqueueSnackbar("Task deleted successfully", { variant: "success" }))
+      .catch(() => enqueueSnackbar("Failed to delete task", { variant: "error" }));
     }
   };
 
+  // Helper function to format timing display
+  const formatTiming = (timing: TimingInfo): string => {
+    return `${timing.relation} ${timing.offset} ${timing.unit}`;
+  };
+
+  // Helper function to format duration display
+  const formatDuration = (duration: number): string => {
+    return `${duration} hour${duration !== 1 ? 's' : ''}`;
+  };
+
   const canManageGlobal = user?.isAdmin;
+
+  // Type guard to check if dependency is a string or an object
+  const getDependencyLabel = (dep: any): string => {
+    return typeof dep === 'string' ? dep : dep.description;
+  };
+
+  // Type guard to get a unique key for dependency
+  const getDependencyKey = (dep: any, index: number): string => {
+    return typeof dep === 'string' ? dep : dep._id || `dep-${index}`;
+  };
+
+  // Render a single task row
+  const renderTaskRow = (task: Task) => (
+    <TableRow key={task._id}>
+      <TableCell>{task.description}</TableCell>
+      <TableCell>{formatDuration(task.duration)}</TableCell>
+      <TableCell>
+        {formatTiming(task.timing)}
+      </TableCell>
+      <TableCell>
+        {task.dependencies && task.dependencies.length > 0 ? (
+          Array.isArray(task.dependencies) && task.dependencies.map((dep: any, index: number) => (
+            <Chip 
+              key={getDependencyKey(dep, index)} 
+              label={getDependencyLabel(dep)} 
+              size="small" 
+              sx={{ mr: 0.5, mb: 0.5 }} 
+            />
+          ))
+        ) : (
+          "None"
+        )}
+      </TableCell>
+      <TableCell>
+        {(canManageGlobal || !task.isGlobal) && (
+          <>
+            <Tooltip title="Edit">
+              <IconButton onClick={() => handleOpenDialog(task)}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton onClick={() => handleDelete(task)}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        )}
+      </TableCell>
+    </TableRow>
+  );
 
   return (
     <DashboardContent>
@@ -209,45 +312,7 @@ export function TaskView() {
                     <TableCell colSpan={5} align="center">Loading...</TableCell>
                   </TableRow>
                 ) : globalTasks.length > 0 ? (
-                  globalTasks.map((task: Task) => (
-                    <TableRow key={task._id}>
-                      <TableCell>{task.description}</TableCell>
-                      <TableCell>{task.duration} mins</TableCell>
-                      <TableCell>
-                        {task.timing.relation} {task.timing.offset} mins
-                      </TableCell>
-                      <TableCell>
-                        {task.dependencies && task.dependencies.length > 0 ? (
-                          Array.isArray(task.dependencies) && task.dependencies.map((dep, index) => (
-                            <Chip 
-                              key={typeof dep === 'string' ? dep : dep._id || index} 
-                              label={typeof dep === 'string' ? dep : dep.description} 
-                              size="small" 
-                              sx={{ mr: 0.5, mb: 0.5 }} 
-                            />
-                          ))
-                        ) : (
-                          "None"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {canManageGlobal && (
-                          <>
-                            <Tooltip title="Edit">
-                              <IconButton onClick={() => handleOpenDialog(task)}>
-                                <EditIcon />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Delete">
-                              <IconButton onClick={() => handleDelete(task)}>
-                                <DeleteIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  globalTasks.map((task: Task) => renderTaskRow(task))
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} align="center">No global tasks found</TableCell>
@@ -279,41 +344,7 @@ export function TaskView() {
                     <TableCell colSpan={5} align="center">Loading...</TableCell>
                   </TableRow>
                 ) : privateTasks.length > 0 ? (
-                  privateTasks.map((task: Task) => (
-                    <TableRow key={task._id}>
-                      <TableCell>{task.description}</TableCell>
-                      <TableCell>{task.duration} mins</TableCell>
-                      <TableCell>
-                        {task.timing.relation} {task.timing.offset} mins
-                      </TableCell>
-                      <TableCell>
-                        {task.dependencies && task.dependencies.length > 0 ? (
-                          Array.isArray(task.dependencies) && task.dependencies.map((dep, index) => (
-                            <Chip 
-                              key={typeof dep === 'string' ? dep : dep._id || index} 
-                              label={typeof dep === 'string' ? dep : dep.description} 
-                              size="small" 
-                              sx={{ mr: 0.5, mb: 0.5 }} 
-                            />
-                          ))
-                        ) : (
-                          "None"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip title="Edit">
-                          <IconButton onClick={() => handleOpenDialog(task)}>
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete">
-                          <IconButton onClick={() => handleDelete(task)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  privateTasks.map((task: Task) => renderTaskRow(task))
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} align="center">No private tasks found</TableCell>
@@ -343,14 +374,15 @@ export function TaskView() {
             
             <TextField
               fullWidth
-              label="Duration (minutes)"
+              label="Duration (hours)"
               name="duration"
               type="number"
               value={formValues.duration}
               onChange={handleChange}
               margin="normal"
               error={!!formErrors.duration}
-              helperText={formErrors.duration}
+              helperText={formErrors.duration || "Task duration in hours"}
+              inputProps={{ step: 0.5 }}
             />
             
             <FormControl fullWidth margin="normal">
@@ -371,13 +403,30 @@ export function TaskView() {
             
             <TextField
               fullWidth
-              label="Timing Offset (minutes)"
+              label="Timing Offset"
               name="timing.offset"
               type="number"
               value={formValues["timing.offset"]}
               onChange={handleChange}
               margin="normal"
+              error={!!formErrors["timing.offset"]}
+              helperText={formErrors["timing.offset"]}
             />
+            
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Offset Unit</InputLabel>
+              <Select
+                name="timing.unit"
+                value={formValues["timing.unit"]}
+                onChange={handleChange}
+                label="Offset Unit"
+              >
+                <MenuItem value="minutes">Minutes</MenuItem>
+                <MenuItem value="hours">Hours</MenuItem>
+                <MenuItem value="seconds">Seconds</MenuItem>
+              </Select>
+              <FormHelperText>Unit for the offset value</FormHelperText>
+            </FormControl>
             
             {user?.isAdmin && !editingTask && (
              <FormControl fullWidth margin="normal">
