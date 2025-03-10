@@ -272,14 +272,6 @@ const authSlice = createSlice({
       .addCase(getAllUsers.pending, (state) => {
         state.loading = true;
       })
-      // .addCase(getAllUsers.fulfilled, (state, action) => {
-      //   state.loading = false;
-      //   state.users = action.payload.users || [];
-      // })
-      // .addCase(getAllUsers.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = action.payload || "Failed to fetch users";
-      // })
       .addCase(getAllUsers.fulfilled, (state, action) => {
         console.log("Users loaded into state:", action.payload);
         state.loading = false;

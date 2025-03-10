@@ -6,7 +6,6 @@ const eventTaskSchema = new mongoose.Schema({
     ref: "Task", 
     required: true 
   },
-  // Optional override fields for the assigned task
   duration: { type: Number },
   dependencies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }],
 });
@@ -15,7 +14,7 @@ const eventSchema = new mongoose.Schema({
   title: { 
     type: String, 
     required: true, 
-    unique: true  // Ensure each event has a unique title
+    unique: true  
   },
   description: { 
     type: String, 
