@@ -112,8 +112,8 @@ export function TaskView() {
       <TableCell>
         {task.dependencies.length > 0
           ? task.dependencies.map((dep: any, index: number) => (
-              <Chip key={index} label={dep.description || dep} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
-            ))
+            <Chip key={index} label={dep.description || dep} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
+          ))
           : "None"}
       </TableCell>
       <TableCell>

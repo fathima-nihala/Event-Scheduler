@@ -1,8 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, SelectChangeEvent, Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem, Select, FormControl, InputLabel, FormHelperText } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../redux/store";
-import { createTask, updateTask } from "../../../slices/taskSlice";
+import { 
+  Box, 
+  Button, 
+  SelectChangeEvent, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  TextField, 
+  MenuItem, 
+  Select, 
+  FormControl, 
+  InputLabel, 
+  FormHelperText,
+  Checkbox,
+  ListItemText,
+  OutlinedInput
+} from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { createTask, updateTask, fetchGlobalTasks, fetchPrivateTasks } from "../../../slices/taskSlice";
 import { useSnackbar } from "notistack";
 
 // Types
@@ -32,6 +49,7 @@ interface FormValues {
   'timing.offset': number;
   'timing.unit': 'minutes' | 'hours' | 'seconds';
   isGlobal: boolean;
+  dependencies: string[];
 }
 
 // Define interface for form errors
@@ -67,10 +85,24 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ open, onClose, task, isAdmin })
     "timing.relation": "after",
     "timing.offset": 0,
     "timing.unit": "minutes",
-    isGlobal: false
+    isGlobal: false,
+    dependencies: []
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
 
+  // Get tasks from Redux store for dependency selection
+  const { globalTasks, privateTasks } = useSelector(
+    (state: RootState) => state.tasks
+  );
+  
+  // Fetch tasks when dialog opens
+  useEffect(() => {
+    if (open) {
+      dispatch(fetchGlobalTasks());
+      dispatch(fetchPrivateTasks());
+    }
+  }, [dispatch, open]);
+  
   // Initialize form when task changes
   useEffect(() => {
     if (task) {
@@ -80,7 +112,10 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ open, onClose, task, isAdmin })
         "timing.relation": task.timing.relation,
         "timing.offset": task.timing.offset,
         "timing.unit": task.timing.unit || "minutes",
-        isGlobal: task.isGlobal
+        isGlobal: task.isGlobal,
+        dependencies: Array.isArray(task.dependencies) 
+          ? task.dependencies.map(dep => typeof dep === 'string' ? dep : dep._id)
+          : []
       });
     } else {
       // Reset form for new task
@@ -90,7 +125,8 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ open, onClose, task, isAdmin })
         "timing.relation": "after",
         "timing.offset": 0,
         "timing.unit": "minutes",
-        isGlobal: false
+        isGlobal: false,
+        dependencies: []
       });
     }
     setFormErrors({});
@@ -123,7 +159,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ open, onClose, task, isAdmin })
         unit: formValues["timing.unit"]
       },
       isGlobal: formValues.isGlobal,
-      dependencies: []
+      dependencies: formValues.dependencies
     };
 
     if (task) {
@@ -151,7 +187,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ open, onClose, task, isAdmin })
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<any>
   ) => {
     const { name, value } = e.target;
     if (name) {
@@ -159,9 +195,24 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ open, onClose, task, isAdmin })
         ...prev,
         [name]: name === "isGlobal" ? value === "true" : 
                 name === "duration" ? Number(value) : 
-                name === "timing.offset" ? Number(value) : value
+                name === "timing.offset" ? Number(value) : 
+                name === "dependencies" ? value : value
       }));
     }
+  };
+
+  // Get available tasks for dependencies, excluding current task and ensuring no circular dependencies
+  const getAvailableTasks = () => {
+    const allTasks = [...globalTasks, ...privateTasks];
+    // Filter out the current task to prevent self-dependency
+    return allTasks.filter(t => !task || t._id !== task._id);
+  };
+
+  // Get task description by ID for display
+  const getTaskDescription = (taskId: string) => {
+    const allTasks = [...globalTasks, ...privateTasks];
+    const foundTask = allTasks.find(t => t._id === taskId);
+    return foundTask ? foundTask.description : "Unknown Task";
   };
 
   return (
@@ -192,6 +243,42 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ open, onClose, task, isAdmin })
             helperText={formErrors.duration || "Task duration in hours"}
             inputProps={{ step: 0.5 }}
           />
+          
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Dependencies</InputLabel>
+            <Select
+              name="dependencies"
+              multiple
+              value={formValues.dependencies}
+              onChange={handleChange}
+              input={<OutlinedInput label="Dependencies" />}
+              renderValue={(selected) => {
+                const selectedArr = selected as string[];
+                return selectedArr.map(id => getTaskDescription(id)).join(", ");
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 224,
+                    width: 250,
+                  },
+                },
+              }}
+            >
+              {getAvailableTasks().map((availableTask) => (
+                <MenuItem key={availableTask._id} value={availableTask._id}>
+                  <Checkbox 
+                    checked={formValues.dependencies.indexOf(availableTask._id) > -1} 
+                  />
+                  <ListItemText 
+                    primary={availableTask.description} 
+                    secondary={availableTask.isGlobal ? "Global Task" : "Private Task"}
+                  />
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>Select tasks this task depends on</FormHelperText>
+          </FormControl>
           
           <FormControl fullWidth margin="normal">
             <InputLabel>Timing Relation</InputLabel>
