@@ -9,6 +9,7 @@ const TaskSchema = new mongoose.Schema({
     offset: { type: Number, required: true },
     unit: { type: String, enum: ["minutes", "hours", "seconds"], default: "minutes" , description: "Unit for the offset value"}
   },
+  startDate: { type: Date, description: "Optional specific start date for the task" },
   isGlobal: { type: Boolean, default: false }, 
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: function() { return !this.isGlobal; } }
 }, { timestamps: true });

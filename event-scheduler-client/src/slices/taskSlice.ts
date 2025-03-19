@@ -17,6 +17,7 @@ interface Task {
   userId?: string;
   createdAt?: string;
   updatedAt?: string;
+  startDate?: Date;
 }
 
 interface TaskState {

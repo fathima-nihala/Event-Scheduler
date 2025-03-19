@@ -352,3 +352,4 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ open, onClose, task, isAdmin })
 };
 
 export default TaskDialog;
+
